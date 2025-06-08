@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+import { useUserStore } from "@/stores/userStore";
 
 export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -10,17 +11,29 @@ export const router = createRouter({
     {
       path: "/signup",
       component: () => import("@/views/SignUpView.vue"),
-      naem: "SignUp",
+      name: "SignUp",
     },
     {
       path: "/login",
       component: () => import("@/views/LogInView.vue"),
-      naem: "Login",
+      name: "Login",
     },
     {
       path: "/userview",
       component: () => import("@/views/UserView.vue"),
-      naem: "UserView",
+      name: "UserView",
+    },
+    {
+      path: "/:pathMatch(.*)*",
+      component: () => import("@/views/NotFound.vue"),
     },
   ],
+});
+
+router.beforeEach((to, from, next) => {
+  const userStore = useUserStore();
+  if (userStore.currentUser === null && to.name === "UserView") {
+    return next({ name: "Login" });
+  }
+  return next();
 });
